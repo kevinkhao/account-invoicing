@@ -88,6 +88,7 @@ Contributors
 -  Saran Lim. <saranl@ecosoft.co.th>
 -  Rattapong Chokmasermkul <rattapongc@ecosoft.co.th>
 -  Komsan Somwong <komsan.s@ecosoft.co.th>
+-  Kevin Khao <kkh@360erp.com>
 
 Maintainers
 -----------

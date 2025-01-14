@@ -1,7 +1,7 @@
 # Copyright 2019 Ecosoft Co., Ltd (https://ecosoft.co.th/)
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl.html)
 
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import UserError, ValidationError
 
 
@@ -133,7 +133,7 @@ class AccountBilling(models.Model):
     def validate_billing(self):
         for rec in self:
             if not rec.billing_line_ids:
-                raise UserError(_("You need to add a line before validate."))
+                raise UserError(self.env._("You need to add a line before validate."))
             date_type = dict(self._fields["threshold_date_type"].selection).get(
                 self.threshold_date_type
             )
@@ -147,7 +147,7 @@ class AccountBilling(models.Model):
                 for b in rec.billing_line_ids
             ):
                 raise ValidationError(
-                    _("Threshold Date cannot be later than the %s in lines")
+                    self.env._("Threshold Date cannot be later than the %s in lines")
                     % (date_type)
                 )
             # keep the number in case of a billing reset to draft
@@ -163,13 +163,13 @@ class AccountBilling(models.Model):
                     .next_by_code(sequence_code)
                 )
             rec.write({"state": "billed"})
-            rec.message_post(body=_("Billing is billed."))
+            rec.message_post(body=self.env._("Billing is billed."))
         return True
 
     def action_cancel_draft(self):
         for rec in self:
             rec.write({"state": "draft"})
-            rec.message_post(body=_("Billing is reset to draft"))
+            rec.message_post(body=self.env._("Billing is reset to draft"))
         return True
 
     def action_cancel(self):
@@ -178,9 +178,9 @@ class AccountBilling(models.Model):
                 lambda m: m.payment_state == "paid"
             )
             if invoice_paid:
-                raise ValidationError(_("Invoice paid already."))
+                raise ValidationError(self.env._("Invoice paid already."))
             rec.write({"state": "cancel"})
-            self.message_post(body=_("Billing %s is cancelled") % rec.name)
+            self.message_post(body=self.env._("Billing %s is cancelled") % rec.name)
         return True
 
     def action_register_payment(self):
@@ -189,12 +189,12 @@ class AccountBilling(models.Model):
     def invoice_relate_billing_tree_view(self):
         name = self.bill_type == "out_invoice" and "Invoices" or "Bills"
         return {
-            "name": _("%s") % (name),
-            "view_mode": "tree,form",
+            "name": self.env._("%s") % (name),
+            "view_mode": "list,form",
             "res_model": "account.move",
             "view_id": False,
             "views": [
-                (self.env.ref("account.view_move_tree").id, "tree"),
+                (self.env.ref("account.view_move_tree").id, "list"),
                 (self.env.ref("account.view_move_form").id, "form"),
             ],
             "type": "ir.actions.act_window",

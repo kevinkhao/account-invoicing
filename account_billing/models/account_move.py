@@ -1,7 +1,7 @@
 # Copyright 2019 Ecosoft Co., Ltd (https://ecosoft.co.th/)
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl.html).
 
-from odoo import Command, _, fields, models
+from odoo import Command, fields, models
 from odoo.exceptions import UserError
 
 
@@ -46,14 +46,14 @@ class AccountMove(models.Model):
         partner = self.mapped("partner_id")
         currency_ids = self.mapped("currency_id")
         if len(partner) > 1:
-            raise UserError(_("Please select invoices with same partner"))
+            raise UserError(self.env._("Please select invoices with same partner"))
 
         if len(currency_ids) > 1:
-            raise UserError(_("Please select invoices with same currency"))
+            raise UserError(self.env._("Please select invoices with same currency"))
 
         if any(move.state != "posted" or move.payment_state == "paid" for move in self):
             raise UserError(
-                _(
+                self.env._(
                     "Billing cannot be processed because "
                     "some invoices are not in the 'Posted' or 'Paid' state already."
                 )
@@ -62,7 +62,7 @@ class AccountMove(models.Model):
         billing = self._create_billing(partner)
 
         action = {
-            "name": _("Billing"),
+            "name": self.env._("Billing"),
             "type": "ir.actions.act_window",
             "res_model": "account.billing",
             "context": {"create": False},
@@ -77,7 +77,7 @@ class AccountMove(models.Model):
         else:
             action.update(
                 {
-                    "view_mode": "tree,form",
+                    "view_mode": "list,form",
                     "domain": [("id", "in", billing.ids)],
                 }
             )
